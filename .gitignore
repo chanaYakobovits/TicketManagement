@@ -1,0 +1,28 @@
+# ===== C# / .NET =====
+bin/
+obj/
+*.user
+*.suo
+.vs/
+*.userosscache
+*.sln.docstates
+packages/
+*.nupkg
+project.lock.json
+project.fragment.lock.json
+artifacts/
+**/Properties/launchSettings.json
+
+# ===== Angular / Node =====
+node_modules/
+dist/
+.angular/
+*.env
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ===== כללי =====
+.DS_Store
+Thumbs.db
+*.log

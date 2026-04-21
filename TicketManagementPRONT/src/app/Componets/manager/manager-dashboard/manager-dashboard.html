@@ -1,0 +1,266 @@
+<div class="page-wrapper">
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-content">
+            <div class="header-right">
+                <div class="logo-section">
+                    <div class="logo-icon">מ.פ</div>
+                    <div class="logo-text">
+                        <h1>Dashboard ניהולי</h1>
+                        <span>מנהל אגף</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="header-left">
+                <div class="date-range-picker">
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                        <rect x="2" y="4" width="14" height="12" rx="2" stroke="currentColor" stroke-width="2"/>
+                        <path d="M2 8h14M6 2v4M12 2v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    <select [(ngModel)]="dateRange">
+                        <option value="today">היום</option>
+                        <option value="week">שבוע אחרון</option>
+                        <option value="month">חודש אחרון</option>
+                        <option value="quarter">רבעון אחרון</option>
+                    </select>
+                </div>
+
+                <button class="btn-export" (click)="exportData()">
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                        <path d="M16 11v4a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-4M13 6L9 2 5 6M9 2v12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    ייצוא דוח
+                </button>
+
+                <div class="user-menu">
+                    <div class="user-avatar">{{ userInitials }}</div>
+                    <span class="user-name">{{ userName }}</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="dashboard-container">
+            <!-- KPI Cards Row -->
+            <div class="kpi-grid">
+                <div class="kpi-card primary">
+                    <div class="kpi-header">
+                        <div class="kpi-icon">
+                            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                                <path d="M14 2v24M2 14h24" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <div class="kpi-trend up">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <path d="M1 15L15 1M15 1H7M15 1v8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            <span>+12%</span>
+                        </div>
+                    </div>
+                    <div class="kpi-value">{{ totalTickets }}</div>
+                    <div class="kpi-label">סה"כ פניות</div>
+                    <div class="kpi-sublabel">{{ newTicketsToday }} חדשות היום</div>
+                </div>
+
+                <div class="kpi-card warning">
+                    <div class="kpi-header">
+                        <div class="kpi-icon">
+                            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                                <circle cx="14" cy="14" r="12" stroke="currentColor" stroke-width="3"/>
+                                <path d="M14 7v7M14 18h.02" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <div class="kpi-badge urgent">דחוף</div>
+                    </div>
+                    <div class="kpi-value">{{ slaBreaches }}</div>
+                    <div class="kpi-label">חריגות SLA</div>
+                    <div class="kpi-sublabel">{{ slaAtRisk }} בסיכון</div>
+                </div>
+
+                <div class="kpi-card success">
+                    <div class="kpi-header">
+                        <div class="kpi-icon">
+                            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                                <path d="M24 8L11 21l-7-7" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <div class="kpi-percentage">{{ resolutionRate }}%</div>
+                    </div>
+                    <div class="kpi-value">{{ resolvedTickets }}</div>
+                    <div class="kpi-label">טופלו בהצלחה</div>
+                    <div class="kpi-sublabel">יעד: 95%</div>
+                </div>
+
+                <div class="kpi-card info">
+                    <div class="kpi-header">
+                        <div class="kpi-icon">
+                            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                                <circle cx="14" cy="14" r="12" stroke="currentColor" stroke-width="3"/>
+                                <path d="M14 8v8l4 2" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="kpi-value">{{ avgResponseTime }}</div>
+                    <div class="kpi-label">זמן מענה ממוצע</div>
+                    <div class="kpi-sublabel">יעד: 4 שעות</div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="charts-row">
+                <!-- Tickets by Category Chart -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>פניות לפי קטגוריה</h3>
+                        <div class="chart-actions">
+                            <button class="chart-btn active">עמודות</button>
+                            <button class="chart-btn">עוגה</button>
+                        </div>
+                    </div>
+                    <div class="chart-placeholder">
+                        <!-- תוכן הגרף יוצב כאן -->
+                        <div class="chart-bars">
+                            <div class="bar-item" *ngFor="let cat of categories">
+                                <div class="bar-label">{{ cat.name }}</div>
+                                <div class="bar-track">
+                                    <div class="bar-fill" [style.width.%]="cat.percentage" [ngClass]="cat.class"></div>
+                                </div>
+                                <div class="bar-value">{{ cat.count }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tickets Trend Chart -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>מגמת פניות - 30 יום</h3>
+                        <div class="legend">
+                            <span class="legend-item">
+                                <span class="legend-dot new"></span>
+                                נפתחו
+                            </span>
+                            <span class="legend-item">
+                                <span class="legend-dot resolved"></span>
+                                נפתרו
+                            </span>
+                        </div>
+                    </div>
+                    <div class="chart-placeholder trend-chart">
+                        <!-- גרף קווים - ניתן לשלב ספריית charts -->
+                        <div class="trend-visual">
+                            <svg viewBox="0 0 400 200" class="trend-svg">
+                                <polyline points="0,180 40,150 80,140 120,160 160,120 200,100 240,110 280,80 320,90 360,70 400,60" 
+                                          stroke="#0067b8" stroke-width="3" fill="none"/>
+                                <polyline points="0,190 40,170 80,160 120,175 160,150 200,140 240,145 280,130 320,135 360,120 400,110" 
+                                          stroke="#4caf50" stroke-width="3" fill="none"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table and Stats Row -->
+            <div class="details-row">
+                <!-- SLA Alerts Table -->
+                <div class="table-card sla-alerts">
+                    <div class="card-header">
+                        <h3>חריגות SLA - דורש טיפול מיידי</h3>
+                        <span class="alert-count">{{ slaAlerts.length }} פניות</span>
+                    </div>
+                    <table class="sla-table">
+                        <thead>
+                            <tr>
+                                <th>מספר</th>
+                                <th>עובד</th>
+                                <th>קטגוריה</th>
+                                <th>זמן שנותר</th>
+                                <th>מטפל</th>
+                                <th>פעולה</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let alert of slaAlerts" class="alert-row">
+                                <td><span class="ticket-num">#{{ alert.id }}</span></td>
+                                <td>{{ alert.employeeName }}</td>
+                                <td><span class="cat-badge">{{ alert.category }}</span></td>
+                                <td><span class="time-critical">{{ alert.timeLeft }}</span></td>
+                                <td>{{ alert.handler }}</td>
+                                <td>
+                                    <button class="action-btn-mini" (click)="viewAlert(alert.id)">צפייה</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Team Performance -->
+                <div class="stats-card team-performance">
+                    <div class="card-header">
+                        <h3>ביצועי צוות</h3>
+                    </div>
+                    <div class="team-list">
+                        <div class="team-member" *ngFor="let member of teamMembers">
+                            <div class="member-info">
+                                <div class="member-avatar">{{ member.initials }}</div>
+                                <div class="member-details">
+                                    <div class="member-name">{{ member.name }}</div>
+                                    <div class="member-role">{{ member.role }}</div>
+                                </div>
+                            </div>
+                            <div class="member-stats">
+                                <div class="stat-mini">
+                                    <span class="stat-mini-value">{{ member.active }}</span>
+                                    <span class="stat-mini-label">פעיל</span>
+                                </div>
+                                <div class="stat-mini">
+                                    <span class="stat-mini-value">{{ member.resolved }}</span>
+                                    <span class="stat-mini-label">טופל</span>
+                                </div>
+                                <div class="satisfaction-mini">
+                                    <span>{{ member.satisfaction }}%</span>
+                                    <div class="satisfaction-bar">
+                                        <div class="satisfaction-fill" [style.width.%]="member.satisfaction"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Insights Card -->
+            <div class="insights-card">
+                <div class="card-header">
+                    <div class="ai-badge-header">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M10 2l2 6h6l-5 4 2 6-5-4-5 4 2-6-5-4h6l2-6z" fill="currentColor"/>
+                        </svg>
+                        תובנות AI
+                    </div>
+                </div>
+                <div class="insights-grid">
+                    <div class="insight-item" *ngFor="let insight of aiInsights">
+                        <div class="insight-icon" [ngClass]="insight.type">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <path *ngIf="insight.type === 'warning'" d="M12 2L2 20h20L12 2zM12 9v4M12 17h.01" 
+                                      stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                <path *ngIf="insight.type === 'success'" d="M20 6L9 17l-5-5" 
+                                      stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                <circle *ngIf="insight.type === 'info'" cx="12" cy="12" r="10" 
+                                        stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                        </div>
+                        <div class="insight-content">
+                            <div class="insight-title">{{ insight.title }}</div>
+                            <div class="insight-description">{{ insight.description }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>

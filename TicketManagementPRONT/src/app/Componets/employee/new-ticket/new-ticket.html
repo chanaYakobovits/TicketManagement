@@ -1,0 +1,230 @@
+<div class="page-wrapper">
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-content">
+            <div class="header-right">
+                <button class="btn-back" (click)="goBack()">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    חזרה
+                </button>
+                <div class="page-breadcrumb">
+                    <span class="breadcrumb-item">הפניות שלי</span>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    <span class="breadcrumb-item active">פתיחת פנייה חדשה</span>
+                </div>
+            </div>
+
+            <div class="header-left">
+                <div class="user-menu-compact">
+                    <div class="user-avatar">{{ userInitials }}</div>
+                    <span class="user-name">{{ userName }}</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="content-container">
+            <!-- Form Card -->
+            <div class="form-card">
+                <div class="form-header">
+                    <div class="form-icon">
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                            <path d="M16 8v16M8 16h16" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <div class="form-header-content">
+                        <h2 class="form-title">פתיחת פנייה חדשה</h2>
+                        <p class="form-subtitle">נשמח לסייע לך. אנא מלא/י את הפרטים הבאים ונטפל בפנייתך בהקדם</p>
+                    </div>
+                </div>
+
+                <form [formGroup]="ticketForm" (ngSubmit)="onSubmit()">
+                    <!-- Subject Field (Optional) -->
+                    <div class="form-group">
+                        <label for="subject" class="form-label">
+                            נושא הפנייה
+                            <span class="label-hint">(אופציונלי)</span>
+                        </label>
+                        <input 
+                            type="text" 
+                            id="subject" 
+                            formControlName="subject"
+                            class="form-input"
+                            placeholder="לדוגמה: בעיה בכרטיס נוכחות, בקשה לחופשה, שאלה לגבי שכר..."
+                        >
+                        <span class="input-hint">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                                <circle cx="7" cy="7" r="6" stroke="currentColor"/>
+                                <path d="M7 4v4M7 10h.01" stroke="currentColor" stroke-linecap="round"/>
+                            </svg>
+                            הנושא יעזור לנו לנתב את הפנייה למטפל המתאים
+                        </span>
+                    </div>
+
+                    <!-- Message Field (Required) -->
+                    <div class="form-group">
+                        <label for="message" class="form-label">
+                            <span class="required">*</span>
+                            תיאור הפנייה
+                        </label>
+                        <textarea 
+                            id="message" 
+                            formControlName="message"
+                            class="form-textarea"
+                            rows="8"
+                            placeholder="נא לתאר את הפנייה בפירוט...
+
+דוגמה:
+שלום,
+אני מעוניין/ת לקבל הבהרה לגבי חישוב ימי החופשה שלי לשנת 2026.
+לפי התלוש האחרון שלי נותרו לי 15 ימים, אך חשבתי שצריכים להיות לי יותר.
+אשמח אם תוכלו לבדוק ולעדכן אותי.
+תודה!"
+                        ></textarea>
+                        <div class="textarea-footer">
+                            <span class="char-count" [class.warning]="getCharCount() < 10">
+                                {{ getCharCount() }} תווים
+                                <span class="char-min" *ngIf="getCharCount() < 10">(מינימום 10)</span>
+                            </span>
+                        </div>
+                        <span class="error-message" *ngIf="isFieldInvalid('message')">
+                            נא להזין לפחות 10 תווים
+                        </span>
+                    </div>
+
+                    <!-- File Upload -->
+                    <div class="form-group">
+                        <label class="form-label">
+                            קבצים מצורפים
+                            <span class="label-hint">(אופציונלי)</span>
+                        </label>
+                        
+                        <div class="upload-area" (click)="fileInput.click()" 
+                             [class.has-files]="uploadedFiles.length > 0"
+                             (dragover)="onDragOver($event)"
+                             (dragleave)="onDragLeave($event)"
+                             (drop)="onDrop($event)">
+                            <input 
+                                type="file" 
+                                #fileInput
+                                multiple
+                                (change)="onFileSelect($event)"
+                                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.xlsx,.xls"
+                                style="display: none;"
+                            >
+                            <div class="upload-icon">
+                                <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                                    <path d="M24 16v16M16 24h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    <rect x="8" y="8" width="32" height="32" rx="4" stroke="currentColor" stroke-width="2"/>
+                                </svg>
+                            </div>
+                            <div class="upload-text">
+                                <strong>לחץ להעלאה</strong> או גרור קבצים לכאן
+                            </div>
+                            <div class="upload-hint">
+                                PDF, Word, Excel, תמונות - עד 10MB לקובץ
+                            </div>
+                        </div>
+
+                        <!-- Uploaded Files List -->
+                        <div class="files-list" *ngIf="uploadedFiles.length > 0">
+                            <div class="file-item" *ngFor="let file of uploadedFiles; let i = index">
+                                <div class="file-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                        <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9l-7-7z" stroke="currentColor" stroke-width="2"/>
+                                        <path d="M13 2v7h7" stroke="currentColor" stroke-width="2"/>
+                                    </svg>
+                                </div>
+                                <div class="file-info">
+                                    <div class="file-name">{{ file.name }}</div>
+                                    <div class="file-size">{{ formatFileSize(file.size) }}</div>
+                                </div>
+                                <button type="button" class="file-remove" (click)="removeFile(i)">
+                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                        <path d="M15 5L5 15M5 5l10 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI Info Box -->
+                    <div class="info-box">
+                        <div class="info-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                <path d="M12 16v-4M12 8h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <div class="info-content">
+                            <strong>מערכת AI חכמה</strong>
+                            <p>המערכת שלנו תנתח את הפנייה באופן אוטומטי ותנתב אותה למטפל המתאים ביותר. זמן התגובה הממוצע הוא עד 24 שעות.</p>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" (click)="onCancel()">
+                            ביטול
+                        </button>
+                        <button type="submit" class="btn-primary" [disabled]="ticketForm.invalid">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <path d="M18 2L9 11M18 2l-7 16-2-7-7-2 16-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            שליחת פנייה
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Help Card -->
+            <div class="help-card">
+                <h3 class="help-title">זקוק/ה לעזרה?</h3>
+                <div class="help-items">
+                    <div class="help-item">
+                        <div class="help-item-icon">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <path d="M10 1a9 9 0 1 0 0 18 9 9 0 0 0 0-18zm0 16a7 7 0 1 1 0-14 7 7 0 0 1 0 14zm1-11H9v6h2V6zm0 8H9v2h2v-2z" fill="currentColor"/>
+                            </svg>
+                        </div>
+                        <div class="help-item-content">
+                            <strong>שאלות נפוצות</strong>
+                            <p>ראה תשובות לשאלות נפוצות במערכת</p>
+                        </div>
+                    </div>
+
+                    <div class="help-item">
+                        <div class="help-item-icon">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <path d="M3 5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5z" stroke="currentColor" stroke-width="2"/>
+                                <path d="M3 9h14M9 3v14" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                        </div>
+                        <div class="help-item-content">
+                            <strong>מדריך למשתמש</strong>
+                            <p>הוראות שימוש מפורטות במערכת</p>
+                        </div>
+                    </div>
+
+                    <div class="help-item">
+                        <div class="help-item-icon">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <path d="M3 8l7.89 5.26a2 2 0 0 0 2.22 0L21 8M5 19h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2z" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                        </div>
+                        <div class="help-item-content">
+                            <strong>צור קשר ישיר</strong>
+                            <p>hr@company.co.il | 03-1234567</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>

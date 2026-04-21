@@ -1,0 +1,279 @@
+<div class="page-wrapper">
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-content">
+            <div class="header-right">
+                <button class="btn-back" (click)="goBack()">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    חזרה לרשימה
+                </button>
+                <div class="ticket-header-info">
+                    <span class="ticket-number">#{{ ticketId }}</span>
+                    <span class="status-badge" [ngClass]="statusClass">{{ status }}</span>
+                </div>
+            </div>
+
+            <div class="header-left">
+                <div class="user-menu-compact">
+                    <div class="user-avatar">{{ userInitials }}</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="content-container">
+            <!-- Main Card -->
+            <div class="ticket-main-card">
+                <!-- Ticket Header -->
+                <div class="ticket-details-header">
+                    <div class="ticket-title-section">
+                        <h1 class="ticket-title">{{ ticketSubject || 'ללא נושא' }}</h1>
+                        <div class="ticket-meta">
+                            <span class="meta-item">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                    <circle cx="8" cy="8" r="6" stroke="currentColor"/>
+                                    <path d="M8 4v4l2 2" stroke="currentColor" stroke-linecap="round"/>
+                                </svg>
+                                נפתח ב-{{ createdDate }}
+                            </span>
+                            <span class="meta-item">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                    <path d="M14 11a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V5a3 3 0 0 1 3-3h6a3 3 0 0 1 3 3v6z" stroke="currentColor"/>
+                                    <path d="M4 7h8M8 4v8" stroke="currentColor"/>
+                                </svg>
+                                {{ category }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="urgency-badge" [ngClass]="urgencyClass">
+                        <span class="urgency-dot"></span>
+                        {{ urgency }}
+                    </div>
+                </div>
+
+                <!-- Original Message -->
+                <div class="message-card original">
+                    <div class="message-header">
+                        <div class="message-author">
+                            <div class="author-avatar">{{ userInitials }}</div>
+                            <div class="author-info">
+                                <div class="author-name">{{ userName }}</div>
+                                <div class="author-role">עובד</div>
+                            </div>
+                        </div>
+                        <div class="message-time">{{ createdDate }} · {{ createdTime }}</div>
+                    </div>
+                    <div class="message-content">
+                        <p>{{ originalMessage }}</p>
+                    </div>
+                    
+                    <!-- Attached Files -->
+                    <div class="message-attachments" *ngIf="attachments.length > 0">
+                        <div class="attachments-title">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <path d="M8.5 1.5L3 7l5.5 5.5L14 7 8.5 1.5z" stroke="currentColor"/>
+                                <path d="M3 12l3 3" stroke="currentColor" stroke-linecap="round"/>
+                            </svg>
+                            קבצים מצורפים
+                        </div>
+                        <div class="attachments-list">
+                            <div class="attachment-item" *ngFor="let file of attachments">
+                                <div class="attachment-icon">
+                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                        <path d="M11 2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7l-6-5z" stroke="currentColor"/>
+                                        <path d="M11 2v5h6" stroke="currentColor"/>
+                                    </svg>
+                                </div>
+                                <div class="attachment-info">
+                                    <div class="attachment-name">{{ file.name }}</div>
+                                    <div class="attachment-size">{{ file.size }}</div>
+                                </div>
+                                <button class="attachment-download" (click)="downloadFile(file.id)">
+                                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                                        <path d="M9 2v10M5 8l4 4 4-4M3 14h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Timeline / History -->
+                <div class="timeline-section">
+                    <h3 class="timeline-title">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="2"/>
+                            <path d="M10 5v5l3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        היסטוריית הפנייה
+                    </h3>
+
+                    <div class="timeline">
+                        <div class="timeline-item" *ngFor="let event of timeline">
+                            <div class="timeline-dot" [ngClass]="event.type"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-header">
+                                    <strong>{{ event.title }}</strong>
+                                    <span class="timeline-time">{{ event.time }}</span>
+                                </div>
+                                <p *ngIf="event.description">{{ event.description }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Responses -->
+                <div class="responses-section" *ngIf="responses.length > 0">
+                    <h3 class="responses-title">תגובות ומענה</h3>
+                    
+                    <div class="message-card response" *ngFor="let response of responses">
+                        <div class="message-header">
+                            <div class="message-author">
+                                <div class="author-avatar handler">{{ response.authorInitials }}</div>
+                                <div class="author-info">
+                                    <div class="author-name">{{ response.authorName }}</div>
+                                    <div class="author-role">{{ response.authorRole }}</div>
+                                </div>
+                            </div>
+                            <div class="message-time">{{ response.date }} · {{ response.time }}</div>
+                        </div>
+                        <div class="message-content">
+                            <p>{{ response.message }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add Comment -->
+                <div class="add-comment-section">
+                    <h3 class="comment-title">הוספת תגובה</h3>
+                    <form [formGroup]="commentForm" (ngSubmit)="submitComment()">
+                        <textarea 
+                            formControlName="comment"
+                            class="comment-textarea"
+                            placeholder="הוסף/י תגובה או מידע נוסף לפנייה..."
+                            rows="4"
+                        ></textarea>
+                        
+                        <div class="comment-actions">
+                            <button type="button" class="btn-attach" (click)="attachFile()">
+                                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                                    <path d="M14.5 8.5l-7 7a4 4 0 1 1-5.7-5.7l7-7a2.5 2.5 0 0 1 3.5 3.5l-7 7a1 1 0 1 1-1.4-1.4l6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                צרף קובץ
+                            </button>
+                            
+                            <button type="submit" class="btn-send" [disabled]="commentForm.invalid">
+                                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                                    <path d="M16 2L8 10M16 2l-6 14-2-6-6-2 14-6z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                שליחת תגובה
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="ticket-sidebar">
+                <!-- Info Card -->
+                <div class="sidebar-card">
+                    <h3 class="sidebar-title">פרטי הפנייה</h3>
+                    
+                    <div class="info-row">
+                        <span class="info-label">סטטוס</span>
+                        <span class="status-badge small" [ngClass]="statusClass">{{ status }}</span>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">דחיפות</span>
+                        <span class="urgency-badge small" [ngClass]="urgencyClass">
+                            <span class="urgency-dot"></span>
+                            {{ urgency }}
+                        </span>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">קטגוריה</span>
+                        <span class="info-value">{{ category }}</span>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">מטפל</span>
+                        <div class="handler-badge" *ngIf="handler">
+                            <div class="handler-avatar-small">{{ handlerInitials }}</div>
+                            <span>{{ handler }}</span>
+                        </div>
+                        <span class="info-value" *ngIf="!handler">טרם שויך</span>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">תאריך פתיחה</span>
+                        <span class="info-value">{{ createdDate }}</span>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">עדכון אחרון</span>
+                        <span class="info-value">{{ lastUpdate }}</span>
+                    </div>
+                </div>
+
+                <!-- SLA Card -->
+                <div class="sidebar-card sla-card">
+                    <h3 class="sidebar-title">זמן טיפול</h3>
+                    
+                    <div class="sla-progress">
+                        <div class="sla-bar">
+                            <div class="sla-fill" [style.width.%]="slaPercentage" [ngClass]="slaStatus"></div>
+                        </div>
+                        <div class="sla-text">
+                            <span class="sla-time">{{ slaRemaining }}</span>
+                            <span class="sla-label">נותרו לטיפול</span>
+                        </div>
+                    </div>
+
+                    <div class="sla-info">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <circle cx="8" cy="8" r="6" stroke="currentColor"/>
+                            <path d="M8 5v3M8 11h.01" stroke="currentColor" stroke-linecap="round"/>
+                        </svg>
+                        <span>זמן טיפול SLA: {{ slaTarget }}</span>
+                    </div>
+                </div>
+
+                <!-- Actions Card -->
+                <div class="sidebar-card actions-card">
+                    <h3 class="sidebar-title">פעולות</h3>
+                    
+                    <button class="action-button" (click)="printTicket()">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M5 7V3h10v4M5 14H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-2" stroke="currentColor" stroke-width="2"/>
+                            <rect x="5" y="11" width="10" height="6" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        הדפסת פנייה
+                    </button>
+
+                    <button class="action-button" (click)="shareTicket()">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <circle cx="5" cy="10" r="3" stroke="currentColor" stroke-width="2"/>
+                            <circle cx="15" cy="5" r="3" stroke="currentColor" stroke-width="2"/>
+                            <circle cx="15" cy="15" r="3" stroke="currentColor" stroke-width="2"/>
+                            <path d="M7.5 11.5l5 2.5M7.5 8.5l5-2.5" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        שיתוף פנייה
+                    </button>
+
+                    <button class="action-button danger" (click)="closeTicket()" *ngIf="canClose">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M15 5L5 15M5 5l10 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        סגירת פנייה
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>

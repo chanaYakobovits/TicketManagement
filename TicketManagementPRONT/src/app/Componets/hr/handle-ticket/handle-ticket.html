@@ -1,0 +1,246 @@
+<div class="page-wrapper">
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-content">
+            <div class="header-right">
+                <button class="btn-back" (click)="goBack()">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    חזרה לתור
+                </button>
+                <div class="ticket-badge-header">
+                    <span class="ticket-number">#{{ ticketId }}</span>
+                    <span class="status-badge" [ngClass]="statusClass">{{ status }}</span>
+                    <span class="urgency-badge" [ngClass]="urgencyClass">
+                        <span class="urgency-dot"></span>
+                        {{ urgency }}
+                    </span>
+                </div>
+            </div>
+            <div class="header-left">
+                <div class="user-avatar">{{ userInitials }}</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="content-grid">
+            <!-- Left Column - Ticket Details -->
+            <div class="left-column">
+                <!-- Original Message Card -->
+                <div class="card message-card">
+                    <div class="card-header">
+                        <h3>הפנייה המקורית</h3>
+                        <span class="timestamp">{{ createdDate }}</span>
+                    </div>
+                    <div class="employee-section">
+                        <div class="employee-avatar">{{ employeeInitials }}</div>
+                        <div class="employee-details">
+                            <div class="employee-name">{{ employeeName }}</div>
+                            <div class="employee-meta">{{ employeeDept }} • {{ employeeId }}</div>
+                        </div>
+                    </div>
+                    <div class="message-content">
+                        <p>{{ ticketMessage }}</p>
+                    </div>
+                    <div class="attachments" *ngIf="attachments.length > 0">
+                        <div class="attachments-title">קבצים מצורפים</div>
+                        <div class="attachment-item" *ngFor="let file of attachments">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <path d="M11 2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7l-6-5z" stroke="currentColor"/>
+                            </svg>
+                            <span>{{ file.name }}</span>
+                            <button (click)="downloadFile(file.id)">הורד</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Suggested Response Card -->
+                <div class="card ai-response-card">
+                    <div class="card-header">
+                        <div class="ai-badge">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <path d="M10 2l2 6h6l-5 4 2 6-5-4-5 4 2-6-5-4h6l2-6z" fill="currentColor"/>
+                            </svg>
+                            תשובה מוצעת מ-AI
+                        </div>
+                        <div class="confidence-score">{{ aiConfidence }}% בטחון</div>
+                    </div>
+                    <div class="suggested-text">
+                        <p>{{ suggestedResponse }}</p>
+                    </div>
+                    <div class="ai-actions">
+                        <button class="btn-use-suggestion" (click)="useSuggestion()">
+                            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                                <path d="M15 5l-8 8-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            השתמש בהצעה
+                        </button>
+                        <button class="btn-edit-suggestion" (click)="editSuggestion()">ערוך</button>
+                    </div>
+                </div>
+
+                <!-- Response Form -->
+                <div class="card response-form-card">
+                    <div class="card-header">
+                        <h3>תגובתך לעובד</h3>
+                    </div>
+                    <form [formGroup]="responseForm">
+                        <textarea formControlName="response" 
+                                  placeholder="כתוב/י את תגובתך כאן..."
+                                  rows="8"></textarea>
+                        <div class="form-actions">
+                            <button type="button" class="btn-attach">
+                                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                                    <path d="M14.5 8.5l-7 7a4 4 0 1 1-5.7-5.7l7-7a2.5 2.5 0 0 1 3.5 3.5l-7 7" stroke="currentColor" stroke-width="2"/>
+                                </svg>
+                                צרף קובץ
+                            </button>
+                            <div class="status-selector">
+                                <select formControlName="newStatus">
+                                    <option value="pending">בטיפול</option>
+                                    <option value="resolved">נפתר</option>
+                                    <option value="needsInfo">דורש מידע נוסף</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn-send-response" (click)="sendResponse()">
+                                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                                    <path d="M16 2L8 10M16 2l-6 14-2-6-6-2 14-6z" stroke="currentColor" stroke-width="2"/>
+                                </svg>
+                                שלח תגובה
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Right Column - AI Analysis & Actions -->
+            <div class="right-column">
+                <!-- AI Analysis Card -->
+                <div class="card ai-analysis-card">
+                    <div class="card-header">
+                        <h3>ניתוח AI</h3>
+                        <div class="ai-badge-mini">מופעל</div>
+                    </div>
+                    
+                    <div class="analysis-item">
+                        <div class="analysis-label">קטגוריה מזוהה</div>
+                        <div class="category-result">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <path d="M8 1l1.5 4.5h4.5l-3.5 2.5 1.5 4.5L8 10l-3.5 2.5 1.5-4.5-3.5-2.5h4.5L8 1z" fill="currentColor"/>
+                            </svg>
+                            <span class="category-name">{{ aiCategory }}</span>
+                            <span class="confidence">{{ aiCategoryConfidence }}%</span>
+                        </div>
+                    </div>
+
+                    <div class="analysis-item">
+                        <div class="analysis-label">רמת דחיפות</div>
+                        <div class="urgency-result" [ngClass]="aiUrgencyClass">
+                            <div class="urgency-level">
+                                <span class="urgency-dot"></span>
+                                {{ aiUrgencyText }}
+                            </div>
+                            <div class="urgency-score">{{ aiUrgencyScore }}/10</div>
+                        </div>
+                    </div>
+
+                    <div class="analysis-item">
+                        <div class="analysis-label">ציון סיכון</div>
+                        <div class="risk-analysis">
+                            <div class="risk-bars-large">
+                                <div class="risk-bar" *ngFor="let i of [1,2,3,4,5,6,7,8,9,10]" 
+                                     [class.active]="i <= aiRiskScore"
+                                     [class.high]="i > 7 && i <= aiRiskScore"
+                                     [class.medium]="i > 4 && i <= 7 && i <= aiRiskScore"></div>
+                            </div>
+                            <div class="risk-description">{{ aiRiskDescription }}</div>
+                        </div>
+                    </div>
+
+                    <div class="analysis-item">
+                        <div class="analysis-label">מילות מפתח</div>
+                        <div class="keywords">
+                            <span class="keyword" *ngFor="let keyword of aiKeywords">{{ keyword }}</span>
+                        </div>
+                    </div>
+
+                    <div class="analysis-item">
+                        <div class="analysis-label">טון רגשי</div>
+                        <div class="sentiment-indicator" [ngClass]="aiSentimentClass">
+                            <div class="sentiment-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                    <path *ngIf="aiSentiment === 'positive'" d="M8 14s1.5 2 4 2 4-2 4-2" stroke="currentColor" stroke-width="2"/>
+                                    <path *ngIf="aiSentiment === 'neutral'" d="M8 13h8" stroke="currentColor" stroke-width="2"/>
+                                    <path *ngIf="aiSentiment === 'negative'" d="M8 16s1.5-2 4-2 4 2 4 2" stroke="currentColor" stroke-width="2"/>
+                                    <circle cx="9" cy="9" r="1" fill="currentColor"/>
+                                    <circle cx="15" cy="9" r="1" fill="currentColor"/>
+                                </svg>
+                            </div>
+                            <span>{{ aiSentimentText }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ticket Info Card -->
+                <div class="card ticket-info-card">
+                    <div class="card-header">
+                        <h3>פרטי הפנייה</h3>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">מספר פנייה</span>
+                        <span class="info-value">#{{ ticketId }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">תאריך פתיחה</span>
+                        <span class="info-value">{{ createdDate }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">SLA יעד</span>
+                        <span class="info-value sla">{{ slaTarget }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">זמן נותר</span>
+                        <span class="info-value" [class.warning]="slaWarning">{{ slaRemaining }}</span>
+                    </div>
+                </div>
+
+                <!-- Actions Card -->
+                <div class="card actions-card">
+                    <div class="card-header">
+                        <h3>פעולות</h3>
+                    </div>
+                    <button class="action-button transfer" (click)="transferTicket()">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M8 3H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3M13 3h4v4M9 11l8-8" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        העבר לטיפול אחר
+                    </button>
+                    <button class="action-button escalate" (click)="escalate()">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M10 15V5M5 10l5-5 5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        העלאה להנהלה
+                    </button>
+                    <button class="action-button" (click)="addNote()">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M11 3H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9l-6-6z" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        הוסף הערה פנימית
+                    </button>
+                    <button class="action-button close" (click)="closeTicket()">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="2"/>
+                            <path d="M13 7l-6 6M7 7l6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        סגירת פנייה
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+<p>handle-ticket works!</p>

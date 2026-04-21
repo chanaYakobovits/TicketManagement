@@ -1,0 +1,87 @@
+ /* You can add global styles to this file, and also import other style files */
+
+:root {
+    --primary-blue: #0067b8;
+    --light-blue: #4da3d6;
+    --dark-blue: #003d71;
+    --accent-teal: #00a3ad;
+  
+    --bg-gradient-start: #f0f7ff;
+    --bg-gradient-end: #e6f3ff;
+  
+    --white: #ffffff;
+  
+    --text-primary: #1a1a1a;
+    --text-secondary: #666666;
+  
+    --border-color: #d4e7f7;
+  
+    --shadow-sm: 0 2px 8px rgba(0, 103, 184, 0.08);
+    --shadow-md: 0 4px 20px rgba(0, 103, 184, 0.12);
+    --shadow-lg: 0 8px 32px rgba(0, 103, 184, 0.15);
+  }
+  
+   /* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Assistant', 'Heebo', -apple-system, sans-serif;
+  background: var(--bg-page);
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+/* Links */
+a {
+  text-decoration: none;
+  color: var(--primary-blue);
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Buttons Base */
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Form Elements */
+input, textarea, select {
+  font-family: inherit;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-page);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
