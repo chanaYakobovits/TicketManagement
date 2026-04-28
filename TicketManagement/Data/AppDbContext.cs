@@ -240,6 +240,7 @@ public partial class AppDbContext : DbContext
                 .HasColumnType("datetime");
             entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
             entity.Property(e => e.Email).HasMaxLength(100);
+            entity.Property(e => e.EmployeeId).HasMaxLength(50).HasColumnName("EmployeeId");
             entity.Property(e => e.FirstName).HasMaxLength(50);
             entity.Property(e => e.JobTitle).HasMaxLength(100);
             entity.Property(e => e.LastName).HasMaxLength(50);

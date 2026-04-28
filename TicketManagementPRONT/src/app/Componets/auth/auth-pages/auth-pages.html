@@ -37,12 +37,12 @@
 
             <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
                 <div class="form-group">
-                    <label for="login-username"><span class="required">*</span>שם משתמש או אימייל</label>
+                    <label for="login-username"><span class="required">*</span>קוד משתשמש או אימייל</label>
                     <input 
                         type="text" 
                         id="login-username" 
-                        formControlName="username"
-                        placeholder="הזינו שם משתמש או כתובת אימייל"
+                        formControlName="employeeId"
+                        placeholder="הזינו קוד משתמש או כתובת אימייל"
                     >
                 </div>
 
@@ -77,7 +77,9 @@
             <div class="alert success" [class.show]="showRegisterSuccess">
                 העובד נוסף בהצלחה! ניתן להתחבר למערכת.
             </div>
-
+            <div class="alert error" [class.show]="showRegisterError">
+                {{ registerErrorMessage }}
+            </div>
             <form [formGroup]="registerForm" (ngSubmit)="onRegister()">
                 <div class="form-group">
                     <label for="full-name"><span class="required">*</span>שם מלא</label>

@@ -3,6 +3,7 @@ export class User{
     lastName!: string;
     email! : string;
     phone!: string;
+    employeeId !: number;
     password!:string;
     userTypeId! : number;
     departmentId!:number;

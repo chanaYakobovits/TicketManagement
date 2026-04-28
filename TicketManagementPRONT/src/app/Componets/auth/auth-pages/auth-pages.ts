@@ -25,7 +25,8 @@ export class AuthPages {
   
   showLoginError = false;
   showRegisterSuccess = false;
-
+  showRegisterError = false;        // ← הוסיפי
+  registerErrorMessage = '';        // ← הוסיפי
   list$!: Observable<UserType[]>;
   allType: UserType[] = [];
   list1$!: Observable<Department[]>;
@@ -65,7 +66,7 @@ export class AuthPages {
   private initializeForms(): void {
     // טופס התחברות
     this.loginForm = this.fb.group({
-      username: ['', [Validators.required]],
+      employeeId: ['', [Validators.required]],
       password: ['', [Validators.required]],
       rememberMe: [false]
     });
@@ -132,65 +133,78 @@ export class AuthPages {
       return;
     }
 
-    const { username, password } = this.loginForm.value;
+    const { employeeId, password } = this.loginForm.value;
 
-    // כאן תוסיפי את הקריאה ל-API
-    console.log('Login attempt:', { username, password });
-
-    // דוגמה להצגת שגיאה
-    // this.showLoginError = true;
-    // setTimeout(() => {
-    //   this.showLoginError = false;
-    // }, 5000);
+    this.authService.login({ employeeId, password }).subscribe({
+      next: (response) => {
+        if (response) {
+          console.log('Login successful');
+          // כאן תוכל להוסיף ניווט לפי סוג המשתמש
+          this.router.navigate(['/']); // או נתיב אחר
+        } else {
+          this.showLoginError = true;
+          setTimeout(() => {
+            this.showLoginError = false;
+          }, 5000);
+        }
+      },
+      error: (err) => {
+        this.showLoginError = true;
+       console.error('Login error:', err);
+        setTimeout(() => {
+          this.showLoginError = false;
+        }, 5000);
+      }
+    });
   }
 
   /**
    * טיפול בהרשמה
    */
-  onRegister(): void {
+onRegister(): void {
     if (this.registerForm.invalid) {
       return;
     }
 
-    const formData = this.registerForm.value;
-    
-    
-  const formValue = this.registerForm.value;
+    const formValue = this.registerForm.value;
 
-  // פיצול שם מלא
-  const nameParts = formValue.fullName.trim().split(' ');
-  const firstName = nameParts[0];
-  const lastName = nameParts.slice(1).join(' '); // תומך גם בשמות עם יותר ממילה אחת
+    const nameParts = formValue.fullName.trim().split(' ');
+    const firstName = nameParts[0];
+    const lastName = nameParts.slice(1).join(' ');
 
-  const user: User = {
-    firstName: firstName,
-    lastName: lastName,
-    email: formValue.email,
-    phone: formValue.phone,
-    password: formValue.password,
-    userTypeId: formValue.role,
-    departmentId: formValue.department,
-    jobTitl: '', 
-    status: true
-  };
+    const user: User = {
+      firstName: firstName,
+      lastName: lastName,
+      email: formValue.email,
+      employeeId: formValue.employeeId,
+      phone: formValue.phone,
+      password: formValue.password,
+      userTypeId: formValue.role,
+      departmentId: formValue.department,
+      jobTitl: '',
+      status: true
+    };
 
-   
-    
-      this.authService.addUser(user).subscribe({
-        next: () => {
-        this.showRegisterSuccess = true;
-        this.registerForm.reset();
-        setTimeout(() => {
-          this.switchTab('login');
-        }, 2000);
-        },
-        error: err => console.error(err)
-      });
-    
-
-   
-  }
-
+    this.authService.addUser(user).subscribe({
+      next: (response) => {
+        if (response?.success) {
+          this.showRegisterSuccess = true;
+          this.registerForm.reset();
+          setTimeout(() => {
+            this.switchTab('login');
+          }, 4000);
+        } else {
+          this.registerErrorMessage = response?.message || 'אירעה שגיאה בהרשמה.';
+          this.showRegisterError = true;
+        }
+      },
+      error: (err) => {
+        console.error(err);
+        this.registerErrorMessage = err?.error?.message || 'אירעה שגיאה בהרשמה.';
+        this.showRegisterError = true;
+      }
+    });
+}
   /**
    * טיפול בשכחת סיסמה
    */

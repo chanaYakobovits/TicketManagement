@@ -36,39 +36,48 @@ namespace Api.Controllers
             var deper = await _UserService.GetDepartment();
             return deper != null ? Ok(deper) : NotFound();
         }
-        [HttpPost]
+
         [HttpPost]
         public async Task<ActionResult> AddUser([FromBody] UserDTO dto)
         {
             if (dto == null)
-            {
-                return BadRequest(new
-                {
-                    success = false,
-                    message = "הנתונים שהתקבלו אינם תקינים."
-                });
-            }
+                return BadRequest(new { success = false, message = "הנתונים שהתקבלו אינם תקינים." });
 
             try
             {
-                var user = await _UserService.Add(dto);
+                var (success, message, data) = await _UserService.Add(dto);
 
-                return Ok(new
-                {
-                    success = true,
-                    message = "משתמש נוסף בהצלחה.",
-                    data = user
-                });
+                if (!success)
+                    return Conflict(new { success = false, message });
+
+                return Ok(new { success = true, message, data });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new
-                {
-                    success = false,
-                    message = ex.InnerException?.Message ?? ex.Message
-                });
+                return StatusCode(500, new { success = false, message = ex.InnerException?.Message ?? ex.Message });
             }
         }
 
+
+        [HttpPost("login")]
+        public async Task<ActionResult> login([FromBody] LoginDTO dto)
+        {
+            if (dto == null)
+                return BadRequest(new { success = false, message = "הנתונים שהתקבלו אינם תקינים." });
+
+            try
+            {
+                var user = await _UserService.Authenticate(dto.EmployeeId, dto.Password);
+
+                if (user == null)
+                    return Unauthorized(new { success = false, message = "קוד משתמש או סיסמה שגויים." });
+
+                return Ok(new { success = true, message = "התחברות בוצעה בהצלחה.", data = user });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = ex.InnerException?.Message ?? ex.Message });
+            }
+        }
     }
 }

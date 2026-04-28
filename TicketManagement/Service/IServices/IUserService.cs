@@ -13,6 +13,7 @@ namespace Service.IServices
         Task<IEnumerable<UserDTO>> GetAll();
         Task<IEnumerable<UserTypeDTO>> GetUserTypes();
         Task<IEnumerable<DepartmentDTO>> GetDepartment();
-        Task<UserDTO> Add(UserDTO userDTO);
+        Task<(bool Success, string Message, UserDTO? Data)> Add(UserDTO userdto);
+        Task<UserDTO?> Authenticate(string employeeId, string password);
     }
 }

@@ -87,17 +87,28 @@ get endItem(): number {
 tickets = [
   {
     id: 1,
-    subject: 'בעיה בשכר',
-    employee: 'דוד לוי',
+    subject: 'בקשת חופשה',
+    employee: 'ישראל ישראלי',
+    employeeName: 'ישראל ישראלי',
+    employeeInitials: 'יי',
+    department: 'פיתוח',
     urgent: true,
-    selected: false
-  },
-  {
-    id: 2,
-    subject: 'טופס חסר',
-    employee: 'שרה כהן',
-    urgent: false,
-    selected: false
+    selected: false,
+    urgency: 'high',
+    urgencyClass: 'urgent-high',
+    urgencyText: 'דחוף',
+    category: 'חופשה',
+    categoryClass: 'cat-vacation',
+    aiConfidence: 92,
+    preview: 'בקשה לחופשה של 3 ימים...',
+    riskLevel: 'risk-low',
+    riskScore: 2,
+    riskLabel: 'נמוך',
+    slaStatus: 'sla-ok',
+    slaRemaining: '4 שעות',
+    slaPercentage: 75,
+    status: 'פתוח',
+    statusClass: 'status-open'
   }
 ];
 

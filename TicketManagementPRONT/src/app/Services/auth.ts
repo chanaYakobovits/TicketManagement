@@ -49,18 +49,26 @@ export class Auth {
       })
     );
   }
-  addUser(user: User): Observable<any> {
+ addUser(user: User): Observable<any> {
     console.log('🔹 Sending applicant details to:', this.BASE_URL, user);
 
-    return this.http.post<any>(
-      `${this.BASE_URL}`,
-      user
-      ).pipe(
+    return this.http.post<any>(`${this.BASE_URL}`, user).pipe(
       tap((data) => console.log('✅ Data received:', data)),
       catchError(error => {
         console.error('❌ Error sending applicant:', error);
-        return of([]);
+        throw error; // ← שנה מ-return of([]) ל-throw error
       })
     );
-  } 
+}
+
+  login(credentials: {employeeId: string, password: string}): Observable<any> {
+    console.log('🔹 Logging in with:', credentials);
+    return this.http.post<any>(`${this.BASE_URL}/login`, credentials).pipe(
+      tap((data) => console.log('✅ Login successful:', data)),
+      catchError(error => {
+        console.error('❌ Login error:', error);
+        return of(null);
+      })
+    );
+}
 }

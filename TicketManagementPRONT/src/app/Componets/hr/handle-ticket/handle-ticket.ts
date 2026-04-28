@@ -16,7 +16,12 @@ export class HandleTicket {
       response: ['']
     });
   }
-
+userInitials = 'מנ';
+  employeeInitials = 'יי';
+  employeeName = 'ישראל ישראלי';
+  employeeDept = 'פיתוח';
+  employeeId = 'EMP001';
+  ticketMessage = 'תוכן הטיקט כאן...';
   // ===== Ticket Info =====
   ticketId = 3421;
   createdDate = '18/02/2026';

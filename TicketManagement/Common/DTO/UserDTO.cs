@@ -12,6 +12,7 @@ public partial class UserDTO
     public string LastName { get; set; } = null!;
 
     public string Email { get; set; } = null!;
+    public int EmployeeId { get; set; }
 
     public string? Phone { get; set; }
 

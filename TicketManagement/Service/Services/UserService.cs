@@ -111,8 +111,19 @@ namespace Service.Services
                 return Enumerable.Empty<DepartmentDTO>();
             }
         }
-        public async Task<UserDTO> Add(UserDTO userdto)
+
+        public async Task<(bool Success, string Message, UserDTO? Data)> Add(UserDTO userdto)
         {
+            // בדיקה אם המייל כבר קיים
+            var emailExists = await _BaseRepository.Items.AnyAsync(u => u.Email == userdto.Email);
+            if (emailExists)
+                return (false, "כתובת המייל כבר קיימת במערכת.", null);
+
+            // בדיקה אם מספר העובד כבר קיים
+            var employeeIdExists = await _BaseRepository.Items.AnyAsync(u => u.EmployeeId == userdto.EmployeeId);
+            if (employeeIdExists)
+                return (false, "מספר העובד כבר קיים במערכת.", null);
+
             var hasher = new PasswordHasher<User>();
 
             var user = new User
@@ -122,6 +133,7 @@ namespace Service.Services
                 Email = userdto.Email,
                 Phone = userdto.Phone,
                 Password = hasher.HashPassword(null, userdto.Password),
+                EmployeeId = userdto.EmployeeId,
                 UserTypeId = userdto.UserTypeId,
                 DepartmentId = userdto.DepartmentId,
                 JobTitle = userdto.JobTitle,
@@ -130,8 +142,33 @@ namespace Service.Services
 
             var newUser = await _BaseRepository.Add(user);
 
-            return _mapper.Map<UserDTO>(newUser.Entity);
+            return (true, "משתמש נוסף בהצלחה.", _mapper.Map<UserDTO>(newUser.Entity));
         }
+        public async Task<UserDTO?> Authenticate(string employeeId, string password)
+        {
+            try
+            {
+                var user = await _BaseRepository.Items.FirstOrDefaultAsync(u =>
+                    u.Email == employeeId || u.EmployeeId.ToString() == employeeId);
 
+                if (user == null) return null;
+
+                var hasher = new PasswordHasher<User>();
+                var result = hasher.VerifyHashedPassword(user, user.Password, password);
+
+                if (result == PasswordVerificationResult.Success || result == PasswordVerificationResult.SuccessRehashNeeded)
+                {
+                    var dto = _mapper.Map<UserDTO>(user);
+                    dto.Password = string.Empty;
+                    return dto;
+                }
+
+                return null;
+            }
+            catch
+            {
+                return null;
+            }
+        }
     }
 }
