@@ -14,6 +14,9 @@ namespace Service.IServices
         Task<IEnumerable<UserTypeDTO>> GetUserTypes();
         Task<IEnumerable<DepartmentDTO>> GetDepartment();
         Task<(bool Success, string Message, UserDTO? Data)> Add(UserDTO userdto);
-        Task<UserDTO?> Authenticate(string employeeId, string password);
+        //Task<UserDTO?> Authenticate(string employeeId, string password);
+        Task<(bool Success, string Message)> ForgotPassword(string email);
+        Task<(bool Success, string Message)> ResetPassword(string token, string newPassword);
+        Task<(bool Success, string Token, UserDTO? User)> Authenticate(string employeeId, string password);
     }
 }

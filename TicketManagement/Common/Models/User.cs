@@ -16,6 +16,8 @@ public partial class User
     public string? Phone { get; set; }
 
     public string Password { get; set; }
+    public string? ResetPasswordToken { get; set; }
+    public DateTime? ResetPasswordTokenExpiry { get; set; }
     public int UserTypeId { get; set; }
 
     public int DepartmentId { get; set; }

@@ -11,7 +11,7 @@ namespace Service
         public static void RegisterServices(this IServiceCollection serviceCollection)
         {
             serviceCollection.AddScoped<IUserService, UserService>();
-            
+            serviceCollection.AddScoped<JwtService>();
 
         }
     }

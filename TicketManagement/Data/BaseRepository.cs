@@ -29,27 +29,7 @@ namespace Data;
             }
 
 
-    //public async Task<List<UserDTO>> GetAllUsers()
-    //{
-
-    //    var allUsers = await context.Users
-    //         .Select(u => new UserDTO
-    //         {
-    //             FirstName = u.FirstName,
-    //             LastName = u.LastName,
-    //             Email = u.Email,
-    //             Phone = u.Phone,
-    //             UserTypeId = u.UserType.Description,
-    //             DepartmentId = u.Department.DepartmentName,
-    //             JobTitle = u.JobTitle,
-    //             Status = u.Status
-    //         })
-    //         .ToListAsync();
-
-
-    //    return allUsers;
-
-    //}
+   
     public virtual async Task<EntityEntry<TEntity>> Add(TEntity entity, bool AllowAnonymous = false)
         {
             try

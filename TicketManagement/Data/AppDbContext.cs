@@ -247,6 +247,8 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Phone).HasMaxLength(30);
             entity.Property(e => e.Password).HasMaxLength(255);
             entity.Property(e => e.UserTypeId).HasColumnName("UserTypeID");
+            entity.Property(e => e.ResetPasswordToken).HasMaxLength(500);
+            entity.Property(e => e.ResetPasswordTokenExpiry).HasColumnType("datetime");
 
             entity.HasOne(d => d.Department).WithMany(p => p.Users)
                 .HasForeignKey(d => d.DepartmentId)

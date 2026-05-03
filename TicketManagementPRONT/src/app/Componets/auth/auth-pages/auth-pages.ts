@@ -7,11 +7,11 @@ import { UserType } from '../../../models/UserType.model';
 import { catchError, Observable, of, tap } from 'rxjs';
 import { Department } from '../../../models/Department.model';
 import { User } from '../../../models/User.model';
-
+import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-auth-pages',
   standalone: true, 
-  imports: [ReactiveFormsModule ,CommonModule],
+  imports: [ReactiveFormsModule ,CommonModule,ReactiveFormsModule, CommonModule, FormsModule],
   templateUrl: './auth-pages.html',
   // styleUrls: ['./auth-pages.css'],
   styleUrl: './auth-pages.css',
@@ -27,6 +27,11 @@ export class AuthPages {
   showRegisterSuccess = false;
   showRegisterError = false;        // ← הוסיפי
   registerErrorMessage = '';        // ← הוסיפי
+  showForgotModal = false;
+  forgotEmail = '';
+  forgotMessage = '';
+  forgotError = '';
+  forgotLoading = false; 
   list$!: Observable<UserType[]>;
   allType: UserType[] = [];
   list1$!: Observable<Department[]>;
@@ -128,36 +133,28 @@ export class AuthPages {
   /**
    * טיפול בהתחברות
    */
-  onLogin(): void {
-    if (this.loginForm.invalid) {
-      return;
-    }
-
-    const { employeeId, password } = this.loginForm.value;
-
-    this.authService.login({ employeeId, password }).subscribe({
-      next: (response) => {
-        if (response) {
-          console.log('Login successful');
-          // כאן תוכל להוסיף ניווט לפי סוג המשתמש
-          this.router.navigate(['/']); // או נתיב אחר
-        } else {
-          this.showLoginError = true;
-          setTimeout(() => {
-            this.showLoginError = false;
-          }, 5000);
-        }
-      },
-      error: (err) => {
-        this.showLoginError = true;
-       console.error('Login error:', err);
-        setTimeout(() => {
-          this.showLoginError = false;
-        }, 5000);
-      }
-    });
+onLogin(): void {
+  if (this.loginForm.invalid) {
+    return;
   }
 
+  const { employeeId, password } = this.loginForm.value;
+
+  this.authService.login({ employeeId, password }).subscribe({
+    next: (response) => {
+      if (response?.success) {
+        this.router.navigate(['/']);
+      } else {
+        this.showLoginError = true;
+        setTimeout(() => this.showLoginError = false, 5000);
+      }
+    },
+    error: () => {
+      this.showLoginError = true;
+      setTimeout(() => this.showLoginError = false, 5000);
+    }
+  });
+}
   /**
    * טיפול בהרשמה
    */
@@ -208,11 +205,39 @@ onRegister(): void {
   /**
    * טיפול בשכחת סיסמה
    */
-  onForgotPassword(event: Event): void {
-    event.preventDefault();
-    // כאן תוסיפי את הלוגיקה לשחזור סיסמה
-    console.log('Forgot password clicked');
+onForgotPassword(event: Event): void {
+  event.preventDefault();
+  this.showForgotModal = true;
+  this.forgotEmail = this.loginForm.get('employeeId')?.value || '';
+}
+
+onForgotSubmit(): void {
+  if (!this.forgotEmail) {
+    this.forgotError = 'נא להזין כתובת מייל';
+    return;
   }
+
+  this.forgotLoading = true;
+  this.forgotError = '';
+  this.forgotMessage = '';
+
+  this.authService.forgotPassword(this.forgotEmail).subscribe({
+    next: (res) => {
+      this.forgotMessage = res.message;
+      this.forgotLoading = false;
+    },
+    error: () => {
+      this.forgotError = 'שגיאה בשליחת המייל, נסי שנית';
+      this.forgotLoading = false;
+    }
+  });
+}
+
+closeForgotModal(): void {
+  this.showForgotModal = false;
+  this.forgotMessage = '';
+  this.forgotError = '';
+}
 
   /**
    * טיפול בלחיצה על תנאי שימוש

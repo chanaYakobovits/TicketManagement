@@ -61,14 +61,48 @@ export class Auth {
     );
 }
 
-  login(credentials: {employeeId: string, password: string}): Observable<any> {
-    console.log('🔹 Logging in with:', credentials);
-    return this.http.post<any>(`${this.BASE_URL}/login`, credentials).pipe(
-      tap((data) => console.log('✅ Login successful:', data)),
-      catchError(error => {
-        console.error('❌ Login error:', error);
-        return of(null);
-      })
-    );
+ login(credentials: { employeeId: string, password: string }): Observable<any> {
+  return this.http.post<any>(`${this.BASE_URL}/login`, credentials).pipe(
+    tap(response => {
+      if (response?.success) {
+        localStorage.setItem('token', response.token);
+        localStorage.setItem('user', JSON.stringify(response.data));
+      }
+    })
+  );
 }
+
+logout(): void {
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+}
+
+getToken(): string | null {
+  return localStorage.getItem('token');
+}
+
+isLoggedIn(): boolean {
+  return !!this.getToken();
+}
+
+forgotPassword(email: string): Observable<any> {
+  return this.http.post<any>(`${this.BASE_URL}/forgot-password`, { email }).pipe(
+    tap((data) => console.log('✅ Forgot password:', data)),
+    catchError(error => {
+      console.error('❌ Forgot password error:', error);
+      throw error;
+    })
+  );
+}
+
+resetPassword(token: string, newPassword: string): Observable<any> {
+  return this.http.post<any>(`${this.BASE_URL}/reset-password`, { token, newPassword }).pipe(
+    tap((data) => console.log('✅ Reset password:', data)),
+    catchError(error => {
+      console.error('❌ Reset password error:', error);
+      throw error;
+    })
+  );
+}
+
 }

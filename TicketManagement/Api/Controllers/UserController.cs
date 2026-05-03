@@ -67,17 +67,45 @@ namespace Api.Controllers
 
             try
             {
-                var user = await _UserService.Authenticate(dto.EmployeeId, dto.Password);
+                var (success, token, user) = await _UserService.Authenticate(
+                    dto.EmployeeId, dto.Password);
 
-                if (user == null)
-                    return Unauthorized(new { success = false, message = "קוד משתמש או סיסמה שגויים." });
+                if (!success)
+                    return Unauthorized(new { success = false, message = token });
 
-                return Ok(new { success = true, message = "התחברות בוצעה בהצלחה.", data = user });
+                return Ok(new { success = true, token = token, data = user });
+                //                              ↑ הטוקן יישלח לפרונט
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { success = false, message = ex.InnerException?.Message ?? ex.Message });
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = ex.InnerException?.Message ?? ex.Message
+                });
             }
+        }
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDTO dto)
+        {
+            if (dto == null || string.IsNullOrEmpty(dto.Email))
+                return BadRequest(new { success = false, message = "נא להזין כתובת מייל" });
+
+            var (success, message) = await _UserService.ForgotPassword(dto.Email);
+            return Ok(new { success, message });
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDTO dto)
+        {
+            if (dto == null)
+                return BadRequest(new { success = false, message = "נתונים חסרים" });
+
+            var (success, message) = await _UserService.ResetPassword(dto.Token, dto.NewPassword);
+
+            return success
+                ? Ok(new { success = true, message })
+                : BadRequest(new { success = false, message });
         }
     }
 }
