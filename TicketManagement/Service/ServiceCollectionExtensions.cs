@@ -12,6 +12,9 @@ namespace Service
         {
             serviceCollection.AddScoped<IUserService, UserService>();
             serviceCollection.AddScoped<JwtService>();
+            serviceCollection.AddScoped<ITicketService, TicketService>();
+            serviceCollection.AddScoped<IAIService, AIService>();
+            serviceCollection.AddHttpClient<AIService>();
 
         }
     }

@@ -123,7 +123,7 @@
                         <circle cx="9" cy="9" r="6" stroke="currentColor" stroke-width="2"/>
                         <path d="M13.5 13.5L17 17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                     </svg>
-                    <input type="text" placeholder="חיפוש פניות..." [(ngModel)]="searchQuery">
+                    <input type="text" placeholder="חיפוש פניות..." [(ngModel)]="searchQuery" (ngModelChange)="applyFilters()">
                 </div>
 
                 <div class="filter-buttons">
@@ -141,7 +141,7 @@
                     </button>
                 </div>
 
-                <select class="sort-select" [(ngModel)]="sortBy">
+                <select class="sort-select" [(ngModel)]="sortBy" (ngModelChange)="applyFilters()">
                     <option value="date">מיון לפי תאריך</option>
                     <option value="status">מיון לפי סטטוס</option>
                     <option value="urgency">מיון לפי דחיפות</option>
@@ -164,33 +164,29 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr *ngFor="let ticket of tickets">
+                            <tr *ngFor="let ticket of paginatedTickets">
                                 <td>
                                     <span class="ticket-number">#{{ ticket.id }}</span>
                                 </td>
                                 <td>
-                                    <div class="ticket-subject">{{ ticket.subject }}</div>
+                                    <div class="ticket-subject">{{ ticket.subject || 'ללא נושא' }}</div>
                                 </td>
                                 <td>
-                                    <span class="ticket-date">{{ ticket.createdDate }}</span>
+                                    <span class="ticket-date">{{ ticket.openedDate }}</span>
                                 </td>
                                 <td>
-                                    <span class="status-badge" [ngClass]="ticket.statusClass">
-                                        {{ ticket.status }}
+                                    <span class="status-badge" [ngClass]="getStatusClass(ticket.currentStatus)">
+                                        {{ ticket.currentStatus }}
                                     </span>
                                 </td>
                                 <td>
-                                    <span class="urgency-badge" [ngClass]="ticket.urgencyClass">
+                                    <span class="urgency-badge" [ngClass]="getUrgencyClass(ticket.urgencyLevel)">
                                         <span class="urgency-dot"></span>
-                                        {{ ticket.urgency }}
+                                        {{ getUrgencyLabel(ticket.urgencyLevel) }}
                                     </span>
                                 </td>
                                 <td>
-                                    <div class="handler-info" *ngIf="ticket.handler">
-                                        <div class="handler-avatar">{{ ticket.handlerInitials }}</div>
-                                        <span>{{ ticket.handler }}</span>
-                                    </div>
-                                    <span class="no-handler" *ngIf="!ticket.handler">טרם שויך</span>
+                                    <span class="no-handler">טרם שויך</span>
                                 </td>
                                 <td>
                                     <button class="action-btn" (click)="viewTicket(ticket.id)">

@@ -10,7 +10,7 @@ public partial class Ticket
     public DateOnly OpenedDate { get; set; }
 
     public TimeOnly OpenedTime { get; set; }
-
+    public string ? Subject { get; set; }
     public string Description { get; set; } = null!;
 
     public int CategoryId { get; set; }

@@ -26,6 +26,7 @@ namespace Common
             CreateMap<TicketStatusHistory, TicketStatusHistoryDTO>().ReverseMap();
             CreateMap<User, UserDTO>().ReverseMap();
             CreateMap<UserType, UserTypeDTO>().ReverseMap();
+            CreateMap<Ticket, TicketDetailDTO>();
 
 
 
