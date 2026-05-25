@@ -13,5 +13,8 @@ namespace Service.IServices
         Task<IEnumerable<TicketDTO>> GetByUserId(int userId);
         //Task<TicketDTO?> GetById(int id);
         Task<TicketDetailDTO?> GetById(int id);
+        Task<IEnumerable<TicketDetailDTO>> GetByAssignedUser(int userId);
+        Task<(bool Success, string Message)> UpdateStatus(int ticketId, string newStatus, int userId, string comment);
+        Task<(bool Success, string Message)> AddMessage(int ticketId, int userId, string content);
     }
 }

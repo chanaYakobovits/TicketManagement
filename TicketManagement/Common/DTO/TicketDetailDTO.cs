@@ -22,5 +22,6 @@ namespace Common.DTO
         public List<MessageDTO> Messages { get; set; } = new();
         public List<TicketStatusHistoryDTO> TicketStatusHistories { get; set; } = new();
         public List<TicketAssignmentDTO> TicketAssignments { get; set; } = new();
+        public List<AianalysisDTO> Aianalyses { get; set; } = new();
     }
 }

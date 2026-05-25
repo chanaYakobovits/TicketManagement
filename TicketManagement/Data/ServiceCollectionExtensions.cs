@@ -42,7 +42,9 @@ namespace Data
             serviceCollection.AddScoped<BaseRepository<User>>();
 
             serviceCollection.AddScoped<BaseRepository<UserType>>();
+            serviceCollection.AddScoped<BaseRepository<TicketStatusHistory>>();
+            serviceCollection.AddScoped<BaseRepository<Message>>();
 
-    }
+        }
     }
 }

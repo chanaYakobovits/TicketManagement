@@ -28,7 +28,9 @@ export class EmployeeHome implements OnInit {
   get totalTickets() { return this.allTickets.length; }
   get pendingTickets() { return this.allTickets.filter(t => t.currentStatus === 'פתוח' || t.currentStatus === 'בטיפול').length; }
   get resolvedTickets() { return this.allTickets.filter(t => t.currentStatus === 'סגור').length; }
-  get urgentTickets() { return this.allTickets.filter(t => t.urgencyLevel >= 4).length; }
+  get urgentTickets() {
+    return this.allTickets.filter(t => t.urgencyLevel >= 3).length;
+  }
 
   // פאגינציה
   get totalPages() { return Math.ceil(this.tickets.length / this.itemsPerPage) || 1; }
@@ -37,7 +39,7 @@ export class EmployeeHome implements OnInit {
     return this.tickets.slice(start, start + this.itemsPerPage);
   }
 
-  constructor(private router: Router, private ticketService: Ticket) {}
+  constructor(private router: Router, private ticketService: Ticket) { }
 
   ngOnInit(): void {
     const raw = localStorage.getItem('user');
@@ -128,10 +130,11 @@ export class EmployeeHome implements OnInit {
   nextPage() { if (this.currentPage < this.totalPages) this.currentPage++; }
   viewTicket(id: number) { this.router.navigate(['/employee/view-ticket', id]); }
   onNewTicket() { this.router.navigate(['/employee/new-ticket']); }
-  toggleUserMenu() {}
-  toggleNotifications() {}
+  toggleUserMenu() { }
+  toggleNotifications() { }
   onLogout() {
     localStorage.removeItem('user');
     this.router.navigate(['/auth']);
   }
+
 }

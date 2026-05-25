@@ -18,15 +18,22 @@ namespace Service.Services
         private readonly BaseRepository<Aianalysis> _aiRepository;
         private readonly IAIService _aiService;
         private readonly IMapper _mapper;
+        private readonly BaseRepository<TicketStatusHistory> _statusHistoryRepository;
+        private readonly BaseRepository<Message> _messageRepository;
+
 
         public TicketService(
-            BaseRepository<Ticket> ticketRepository,
-            BaseRepository<Aianalysis> aiRepository,
-            IAIService aiService,
-            IMapper mapper)
+    BaseRepository<Ticket> ticketRepository,
+    BaseRepository<Aianalysis> aiRepository,
+    BaseRepository<TicketStatusHistory> statusHistoryRepository,
+    BaseRepository<Message> messageRepository,
+    IAIService aiService,
+    IMapper mapper)
         {
             _ticketRepository = ticketRepository;
             _aiRepository = aiRepository;
+            _statusHistoryRepository = statusHistoryRepository;
+            _messageRepository = messageRepository;
             _aiService = aiService;
             _mapper = mapper;
         }
@@ -61,8 +68,9 @@ namespace Service.Services
                 .Include(t => t.Messages).ThenInclude(m => m.User)
                 .Include(t => t.TicketStatusHistories).ThenInclude(h => h.ChangedByUser)
                 .Include(t => t.TicketAssignments).ThenInclude(ta => ta.User)
+               .Include(t => t.Aianalyses)
                 .FirstOrDefaultAsync(t => t.Id == id);
-
+            
             return ticket == null ? null : _mapper.Map<TicketDetailDTO>(ticket);
         }
         public async Task<(bool Success, string Message, TicketDTO? Data)> Add(TicketDTO dto)
@@ -110,6 +118,69 @@ namespace Service.Services
             catch (Exception ex)
             {
                 return (false, ex.InnerException?.Message ?? ex.Message, null);
+            }
+        }
+        public async Task<IEnumerable<TicketDetailDTO>> GetByAssignedUser(int userId)
+        {
+            var tickets = await _ticketRepository.Items
+                .Where(t => t.TicketAssignments.Any(a => a.UserId == userId))
+                .Include(t => t.Category)
+                .Include(t => t.OpenedByUser)
+                .Include(t => t.Aianalyses)
+                .Include(t => t.TicketAssignments).ThenInclude(a => a.User)
+                .OrderByDescending(t => t.UrgencyLevel)
+                .ThenByDescending(t => t.OpenedDate)
+                .ToListAsync();
+
+            return _mapper.Map<IEnumerable<TicketDetailDTO>>(tickets);
+        }
+        public async Task<(bool Success, string Message)> UpdateStatus(int ticketId, string newStatus, int userId, string comment)
+        {
+            try
+            {
+                var ticket = await _ticketRepository.Items.FirstOrDefaultAsync(t => t.Id == ticketId);
+                if (ticket == null) return (false, "פנייה לא נמצאה");
+
+                var history = new TicketStatusHistory
+                {
+                    TicketId = ticketId,
+                    PreviousStatus = ticket.CurrentStatus,
+                    NewStatus = newStatus,
+                    ChangedByUserId = userId,
+                    Comment = comment,
+                    ChangedAt = DateTime.Now
+                };
+
+                ticket.CurrentStatus = newStatus;
+                await _ticketRepository.Update(ticket);
+                await _statusHistoryRepository.Add(history);
+
+                return (true, "סטטוס עודכן בהצלחה");
+            }
+            catch (Exception ex)
+            {
+                return (false, ex.InnerException?.Message ?? ex.Message);
+            }
+        }
+
+        public async Task<(bool Success, string Message)> AddMessage(int ticketId, int userId, string content)
+        {
+            try
+            {
+                var message = new Message
+                {
+                    TicketId = ticketId,
+                    UserId = userId,
+                    Content = content,
+                    SentAt = DateTime.Now
+                };
+
+                await _messageRepository.Add(message);
+                return (true, "תגובה נשלחה בהצלחה");
+            }
+            catch (Exception ex)
+            {
+                return (false, ex.InnerException?.Message ?? ex.Message);
             }
         }
     }

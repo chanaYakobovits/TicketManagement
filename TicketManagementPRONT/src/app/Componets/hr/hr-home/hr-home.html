@@ -224,7 +224,8 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr *ngFor="let ticket of tickets" [class.urgent-row]="ticket.urgency === 'high'">
+                            
+                           <tr *ngFor="let ticket of paginatedTickets" [class.urgent-row]="ticket.urgencyLevel >= 3">
                                 <td>
                                     <input type="checkbox" [(ngModel)]="ticket.selected">
                                 </td>

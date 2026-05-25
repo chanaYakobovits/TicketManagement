@@ -27,6 +27,25 @@ namespace Api.Controllers
             var ticket = await _ticketService.GetById(id);
             return ticket == null ? NotFound() : Ok(ticket);
         }
+        [HttpGet("assigned/{userId}")]
+        public async Task<IActionResult> GetByAssignedUser(int userId)
+        {
+            var tickets = await _ticketService.GetByAssignedUser(userId);
+            return Ok(tickets);
+        }
+        [HttpPut("{id}/status")]
+        public async Task<IActionResult> UpdateStatus(int id, [FromBody] UpdateStatusDTO dto)
+        {
+            var (success, message) = await _ticketService.UpdateStatus(id, dto.NewStatus, dto.UserId, dto.Comment);
+            return success ? Ok(new { success, message }) : BadRequest(new { success, message });
+        }
+
+        [HttpPost("{id}/message")]
+        public async Task<IActionResult> AddMessage(int id, [FromBody] AddMessageDTO dto)
+        {
+            var (success, message) = await _ticketService.AddMessage(id, dto.UserId, dto.Content);
+            return success ? Ok(new { success, message }) : BadRequest(new { success, message });
+        }
         [HttpPost]
             public async Task<IActionResult> AddTicket([FromBody] TicketDTO dto)
             {
@@ -46,6 +65,7 @@ namespace Api.Controllers
                     return StatusCode(500, new { success = false, message = ex.InnerException?.Message ?? ex.Message });
                 }
             }
+
         }
     }
 

@@ -16,11 +16,22 @@ export class Ticket {
   getTicketsByUser(userId: number): Observable<any[]> {
     return this.http.get<any[]>(`${this.BASE_URL}/user/${userId}`);
   }
-getTicketById(id: number): Observable<any> {
-  return this.http.get<any>(`${this.BASE_URL}/${id}`);
-}
+  getTicketById(id: number): Observable<any> {
+    return this.http.get<any>(`${this.BASE_URL}/${id}`);
+  }
 
   addTicket(ticket: TicketDTO): Observable<any> {
     return this.http.post(this.BASE_URL, ticket);
   }
+  getAssignedTickets(userId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.BASE_URL}/assigned/${userId}`);
+  }
+updateStatus(ticketId: number, dto: { newStatus: string; userId: number; comment: string }): Observable<any> {
+  return this.http.put(`${this.BASE_URL}/${ticketId}/status`, dto);
+}
+
+addMessage(ticketId: number, dto: { userId: number; content: string }): Observable<any> {
+  return this.http.post(`${this.BASE_URL}/${ticketId}/message`, dto);
+}
+
 }

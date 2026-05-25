@@ -5,11 +5,11 @@ import { authGuard } from './Services/auth.guard';
 import { EmployeeHome } from './Componets/employee/employee-home/employee-home';
 import { NewTicket } from './Componets/employee/new-ticket/new-ticket';
 import { ViewTicket } from './Componets/employee/view-ticket/view-ticket';
+import { HandleTicket } from './Componets/hr/handle-ticket/handle-ticket';
+import { HrHome } from './Componets/hr/hr-home/hr-home';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'auth', pathMatch: 'full' },
-  
-  // דפים פתוחים — ללא Guard
   { path: 'auth', component: AuthPages },
   { path: 'reset-password', component: ResetPassword },
   {
@@ -18,6 +18,13 @@ export const routes: Routes = [
       { path: '', component: EmployeeHome },
       { path: 'new-ticket', component: NewTicket },
       { path: 'view-ticket/:id', component: ViewTicket },
+    ]
+  },
+  {
+    path: 'hr',
+    children: [
+      { path: '', component: HrHome },
+      { path: 'handle-ticket/:id', component: HandleTicket },
     ]
   },
   { path: '**', redirectTo: 'auth' }
