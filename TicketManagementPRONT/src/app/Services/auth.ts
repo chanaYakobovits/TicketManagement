@@ -61,7 +61,7 @@ export class Auth {
     );
 }
 
- login(credentials: { employeeId: string, password: string }): Observable<any> {
+ login(credentials: { employeeIdOrEmail: string, password: string }): Observable<any> {
   return this.http.post<any>(`${this.BASE_URL}/login`, credentials).pipe(
     tap(response => {
       if (response?.success) {

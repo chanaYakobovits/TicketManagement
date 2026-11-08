@@ -274,12 +274,13 @@ namespace Service.Services
                 var dto = _mapper.Map<UserDTO>(user);
                 dto.Password = string.Empty;
 
-                var token = _jwtService.GenerateToken(dto); // ← הוסף JwtService ל-constructor
+                var token = _jwtService.GenerateToken(dto); 
 
                 return (true, token, dto);
             }
-            catch
+            catch (Exception ex)
             {
+                Console.WriteLine(ex);
                 return (false, "אירעה שגיאה פנימית", null);
             }
         }

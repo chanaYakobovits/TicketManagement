@@ -60,29 +60,26 @@ namespace Api.Controllers
 
 
         [HttpPost("login")]
-        public async Task<ActionResult> login([FromBody] LoginDTO dto)
+      
+        public async Task<ActionResult> Login([FromBody] LoginDTO dto)
         {
             if (dto == null)
                 return BadRequest(new { success = false, message = "הנתונים שהתקבלו אינם תקינים." });
 
             try
             {
-                var (success, token, user) = await _UserService.Authenticate(
-                    dto.EmployeeId, dto.Password);
+                var (success, tokenOrMessage, user) = await _UserService.Authenticate(
+                    dto.EmployeeIdOrEmail, dto.Password);
 
                 if (!success)
-                    return Unauthorized(new { success = false, message = token });
+                    return Unauthorized(new { success = false, message = tokenOrMessage });
 
-                return Ok(new { success = true, token = token, data = user });
-                //                              ↑ הטוקן יישלח לפרונט
+                return Ok(new { success = true, token = tokenOrMessage, data = user });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new
-                {
-                    success = false,
-                    message = ex.InnerException?.Message ?? ex.Message
-                });
+                
+                return StatusCode(500, new { success = false, message = "אירעה שגיאה פנימית" });
             }
         }
         [HttpPost("forgot-password")]

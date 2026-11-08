@@ -71,7 +71,7 @@ export class AuthPages {
   private initializeForms(): void {
     // טופס התחברות
     this.loginForm = this.fb.group({
-      employeeId: ['', [Validators.required]],
+      employeeIdOrEmail: ['', [Validators.required]],
       password: ['', [Validators.required]],
       rememberMe: [false]
     });
@@ -138,9 +138,9 @@ onLogin(): void {
     return;
   }
 
-  const { employeeId, password } = this.loginForm.value;
+  const { employeeIdOrEmail, password } = this.loginForm.value;
 
-  this.authService.login({ employeeId, password }).subscribe({
+  this.authService.login({ employeeIdOrEmail, password }).subscribe({
     next: (response) => {
       if (response?.success) {
         this.router.navigate(['/']);
@@ -248,9 +248,7 @@ closeForgotModal(): void {
     console.log('Terms clicked');
   }
 
-  /**
-   * טיפול בלחיצה על מדיניות פרטיות
-   */
+  
   onPrivacyClick(event: Event): void {
     event.preventDefault();
     // כאן תוסיפי את הלוגיקה להצגת מדיניות פרטיות

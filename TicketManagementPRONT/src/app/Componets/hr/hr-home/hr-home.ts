@@ -11,6 +11,7 @@ import { Ticket } from '../../../Services/ticket';
   templateUrl: './hr-home.html',
   styleUrl: './hr-home.css',
 })
+
 export class HrHome implements OnInit {
   userInitials = '';
   userName = '';
